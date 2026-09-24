@@ -1,0 +1,75 @@
+name: cask
+
+# One workflow for both jobs a tap needs:
+#  - check: every push and pull request installs the cask on a real Mac
+#  - bump: on a schedule (or by hand) follow magpie's latest release, test
+#    the new version the same way, and commit it only if that passes.
+# The bump runs here, with this repo's own token, so the magpie repo needs
+# no secret with write access to the tap.
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    - cron: "17 */6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  cask:
+    runs-on: macos-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      HOMEBREW_NO_AUTO_UPDATE: "1"
+      HOMEBREW_NO_INSTALL_CLEANUP: "1"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Follow the latest magpie release
+        id: bump
+        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+        run: bash scripts/bump.sh
+
+      - name: Skip when nothing changed
+        id: go
+        run: |
+          if [ "${{ github.event_name }}" = "schedule" ] || [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "run=${{ steps.bump.outputs.changed }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Tap this checkout
+        if: steps.go.outputs.run == 'true'
+        run: |
+          # brew taps a git repo; commit the bumped cask locally first so the
+          # tap sees the file as it will be pushed
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git diff --quiet || git commit -am "magpie ${{ steps.bump.outputs.version }}"
+          brew tap newdee/tap "$GITHUB_WORKSPACE"
+
+      - name: Audit
+        if: steps.go.outputs.run == 'true'
+        run: brew audit --cask --strict --online newdee/tap/magpie
+
+      - name: Install, check, uninstall
+        if: steps.go.outputs.run == 'true'
+        run: |
+          brew install --cask newdee/tap/magpie
+          app=/Applications/magpie.app
+          test -d "$app"
+          defaults read "$app/Contents/Info.plist" CFBundleShortVersionString
+          want=$(sed -n 's/^  version "\(.*\)"$/\1/p' Casks/magpie.rb)
+          got=$(defaults read "$app/Contents/Info.plist" CFBundleShortVersionString)
+          test "$want" = "$got"
+          codesign --verify --deep --strict "$app"
+          spctl --assess --type execute --verbose "$app"
+          brew uninstall --cask --zap newdee/tap/magpie
+          test ! -d "$app"
+
+      - name: Publish the bump
+        if: steps.go.outputs.run == 'true' && steps.bump.outputs.changed == 'true'
+        run: git push origin HEAD:main
