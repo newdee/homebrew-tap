@@ -32,6 +32,9 @@ class Keepane < Formula
     bin.install "keepane"
     pkgshare.install "keepane.conf.example"
     doc.install "README.md", "README.zh-CN.md"
+    # Tab completion (bash, zsh, fish) and `man keepane`, from the program.
+    generate_completions_from_executable(bin/"keepane", "completion")
+    (man1/"keepane.1").write Utils.safe_popen_read(bin/"keepane", "man", "--roff")
   end
 
   def caveats
@@ -47,6 +50,10 @@ class Keepane < Formula
     # A server of its own: a detached session comes up and is listed.
     system bin/"keepane", "-L", "brewtest", "new", "-d", "-s", "t"
     assert_match(/^t: 1 windows/, shell_output("#{bin}/keepane -L brewtest ls"))
+    # Completion answers from the running server; the manual is installed.
+    assert_match(/^attach-session$/, shell_output("#{bin}/keepane __complete attach-s"))
+    assert_match "keepane __complete", (zsh_completion/"_keepane").read
+    assert_match ".TH KEEPANE 1", (man1/"keepane.1").read
   ensure
     quiet_system bin/"keepane", "-L", "brewtest", "kill-server"
   end
