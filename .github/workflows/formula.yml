@@ -1,0 +1,111 @@
+name: formula
+
+# keepane's formula, kept the way cask.yml keeps magpie's cask:
+#  - check: a change to the formula installs and tests it on macOS and Linux
+#  - bump: on a schedule (or by hand) follow keepane's latest release, test
+#    the new version on both, and commit it only if both pass.
+
+# The bump runs here, with this repo's own token, so the keepane repo needs
+# no secret with write access to the tap.
+on:
+  push:
+    branches: [main]
+    paths:
+      - Formula/keepane.rb
+      - scripts/bump-keepane.sh
+      - .github/workflows/formula.yml
+  pull_request:
+    paths:
+      - Formula/keepane.rb
+      - scripts/bump-keepane.sh
+      - .github/workflows/formula.yml
+  schedule:
+    - cron: "47 */6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  GH_TOKEN: ${{ github.token }}
+  # brew audit --online asks the GitHub API about the repo; anonymous
+  # calls from a shared runner IP run into the rate limit
+  HOMEBREW_GITHUB_API_TOKEN: ${{ github.token }}
+  HOMEBREW_NO_AUTO_UPDATE: "1"
+  HOMEBREW_NO_INSTALL_CLEANUP: "1"
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    outputs:
+      version: ${{ steps.bump.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Homebrew on the path (Linux)
+        if: runner.os == 'Linux'
+        run: echo "/home/linuxbrew/.linuxbrew/bin" >> "$GITHUB_PATH"
+
+      - name: Follow the latest keepane release
+        id: bump
+        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+        run: bash scripts/bump-keepane.sh
+
+      - name: Skip when nothing changed
+        id: go
+        run: |
+          if [ "${{ github.event_name }}" = "schedule" ] || [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "run=${{ steps.bump.outputs.changed }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Tap this checkout
+        if: steps.go.outputs.run == 'true'
+        run: |
+          # brew taps a git repo; commit the bumped formula locally first so
+          # the tap sees the file as it will be pushed
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git diff --quiet || git commit -am "keepane ${{ steps.bump.outputs.version }}"
+          brew tap newdee/tap "$GITHUB_WORKSPACE"
+
+      - name: Audit
+        if: steps.go.outputs.run == 'true'
+        run: brew audit --formula --strict --online newdee/tap/keepane
+
+      - name: Install, test, uninstall
+        if: steps.go.outputs.run == 'true'
+        run: |
+          brew install --formula newdee/tap/keepane
+          brew test newdee/tap/keepane
+          want=$(sed -n 's|.*/releases/download/v\([^/]*\)/.*|\1|p' Formula/keepane.rb | sort -u)
+          got=$("$(brew --prefix)/bin/keepane" -V)
+          test "$got" = "keepane $want"
+          brew uninstall --formula newdee/tap/keepane
+          test ! -e "$(brew --prefix)/bin/keepane"
+
+  publish:
+    needs: test
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Follow the latest keepane release
+        id: bump
+        run: bash scripts/bump-keepane.sh
+
+      - name: Publish the bump
+        # only the version both platforms tested (a release published in
+        # between waits for the next run)
+        if: steps.bump.outputs.changed == 'true' && steps.bump.outputs.version == needs.test.outputs.version
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -am "keepane ${{ steps.bump.outputs.version }}"
+          git push origin HEAD:main
