@@ -1,32 +1,31 @@
 class Keepane < Formula
   desc "Terminal multiplexer whose panes keep running and pass messages to each other"
   homepage "https://github.com/newdee/keepane"
-  version "0.17.0"
   license "MIT"
 
+  livecheck do
+    url :stable
+    strategy :github_latest
+  end
+
   # The release's own builds; scripts/bump-keepane.sh keeps these three
-  # in step with it (the version line and the sha256 after each url).
+  # in step with it (the version in each url and the sha256 after it).
   on_macos do
     on_arm do
-      url "https://github.com/newdee/keepane/releases/download/v#{version}/keepane-v#{version}-macos-aarch64.tar.gz"
+      url "https://github.com/newdee/keepane/releases/download/v0.17.0/keepane-v0.17.0-macos-aarch64.tar.gz"
       sha256 "aa623896bdea469fdd93254d33925b43e8d4d8a44dd8db554fab9dd212bb782e"
     end
     on_intel do
-      url "https://github.com/newdee/keepane/releases/download/v#{version}/keepane-v#{version}-macos-x86_64.tar.gz"
+      url "https://github.com/newdee/keepane/releases/download/v0.17.0/keepane-v0.17.0-macos-x86_64.tar.gz"
       sha256 "a5426b3f52831861035bda0e96e9e911e1d71abd393907a92e693c603b69ae77"
     end
   end
 
   on_linux do
     on_intel do
-      url "https://github.com/newdee/keepane/releases/download/v#{version}/keepane-v#{version}-linux-x86_64.tar.gz"
+      url "https://github.com/newdee/keepane/releases/download/v0.17.0/keepane-v0.17.0-linux-x86_64.tar.gz"
       sha256 "fe431be9015d8d14af37f67bf4f20f496429b3009665c08b536c1d70fb51be31"
     end
-  end
-
-  livecheck do
-    url :stable
-    strategy :github_latest
   end
 
   def install

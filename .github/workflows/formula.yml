@@ -83,7 +83,7 @@ jobs:
         run: |
           brew install --formula newdee/tap/keepane
           brew test newdee/tap/keepane
-          want=$(sed -n 's/^  version "\(.*\)"$/\1/p' Formula/keepane.rb)
+          want=$(sed -n 's|.*/releases/download/v\([^/]*\)/.*|\1|p' Formula/keepane.rb | sort -u)
           got=$("$(brew --prefix)/bin/keepane" -V)
           test "$got" = "keepane $want"
           brew uninstall --formula newdee/tap/keepane
