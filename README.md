@@ -34,6 +34,24 @@ The formula follows keepane's latest release on its own: a scheduled workflow
 picks up a new version, installs and tests it on macOS and Linux runners, and
 only then commits it.
 
+## smep
+
+[smep](https://github.com/newdee/smep) is a simple Markdown editor and
+previewer written in Rust: source, split and rendered views, the rendered
+one editable block by block.
+
+```sh
+brew install newdee/tap/smep
+smep notes.md
+```
+
+macOS (Apple Silicon and Intel, one universal binary) and Linux x86_64, from
+the release's own builds. `brew upgrade smep` takes a new version. This is
+the `smep` command; for a Finder-openable app use the `smep.app` from a
+[release](https://github.com/newdee/smep/releases).
+
+The formula follows smep's latest release on its own, the way keepane's does.
+
 ---
 
 ## magpie
@@ -65,3 +83,19 @@ brew install newdee/tap/keepane
 
 formula 会自己跟进 keepane 的最新版本：定时工作流发现新版后，先在 macOS 和
 Linux runner 上真装并测试，通过了才提交。
+
+## smep
+
+[smep](https://github.com/newdee/smep) 是一个 Rust 写的简洁 Markdown 编辑器兼
+预览器：源码、分栏、渲染三种视图，渲染视图可以按块直接编辑。
+
+```sh
+brew install newdee/tap/smep
+smep notes.md
+```
+
+支持 macOS（Apple Silicon 与 Intel，同一个通用二进制）和 Linux x86_64，安装的是
+发布页上编译好的包。`brew upgrade smep` 升级到新版本。装的是 `smep` 命令；要在
+Finder 里双击打开，用[发布页](https://github.com/newdee/smep/releases)上的 `smep.app`。
+
+formula 会自己跟进 smep 的最新版本，方式与 keepane 相同。
