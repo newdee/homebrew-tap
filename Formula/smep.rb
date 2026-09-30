@@ -20,11 +20,11 @@ class Smep < Formula
   on_macos do
     on_arm do
       url "https://github.com/newdee/smep/releases/download/v0.1.2/smep-v0.1.2-macos-universal.tar.gz"
-      sha256 "d95055f38ad141aa6bb52523b062fbcf015b71c72dc6fe8c89d24165c4b37df8"
+      sha256 "afe373ea20e13f291774f7e4e00d71b7344f7eddda430cc09d58dda54727e233"
     end
     on_intel do
       url "https://github.com/newdee/smep/releases/download/v0.1.2/smep-v0.1.2-macos-universal.tar.gz"
-      sha256 "d95055f38ad141aa6bb52523b062fbcf015b71c72dc6fe8c89d24165c4b37df8"
+      sha256 "afe373ea20e13f291774f7e4e00d71b7344f7eddda430cc09d58dda54727e233"
     end
   end
 
