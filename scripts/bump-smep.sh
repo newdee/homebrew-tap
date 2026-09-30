@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # Point Formula/smep.rb at the latest published smep release: the version
-# in each of its urls, and the sha256 after each url, computed from the
-# downloaded archives.
+# in each of its three urls, and the sha256 after each url, computed from
+# the downloaded archives (two of the urls name the same universal macOS
+# archive).
 # Prints "changed=true|false" (and the version) to $GITHUB_OUTPUT when set.
 set -euo pipefail
 
@@ -31,7 +32,7 @@ mac=$(sha macos-universal.zip)
 linux=$(sha x86_64-linux.tar.gz)
 
 # Each url moves to the new version; the sha256 that follows it is that
-# archive's.
+# archive's. The macOS archive appears twice (on_arm and on_intel).
 awk -v old="v${current}" -v new="v${version}" -v mac="$mac" -v linux="$linux" '
   function swap(s,   i, r) {
     r = ""
@@ -43,7 +44,7 @@ awk -v old="v${current}" -v new="v${version}" -v mac="$mac" -v linux="$linux" '
   /^ *url "/ { $0 = swap($0); u++ }
   /^ *sha256 "/ && want != "" { sub(/"[0-9a-f]*"/, "\"" want "\""); want = ""; n++ }
   { print }
-  END { if (u != 2 || n != 2) { print "expected 2 urls and 2 sha256 lines, found " u " and " n > "/dev/stderr"; exit 1 } }
+  END { if (u != 3 || n != 3) { print "expected 3 urls and 3 sha256 lines, found " u " and " n > "/dev/stderr"; exit 1 } }
 ' "$formula" > "$tmp/smep.rb"
 mv "$tmp/smep.rb" "$formula"
 

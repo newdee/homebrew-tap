@@ -8,11 +8,19 @@ class Smep < Formula
     strategy :github_latest
   end
 
-  # The release's own builds; scripts/bump-smep.sh keeps these two in step
-  # with it (the version in each url and the sha256 after it).
+  # The release's own builds; scripts/bump-smep.sh keeps these three in
+  # step with it (the version in each url and the sha256 after it). The
+  # macOS archive is one universal binary, listed once per architecture
+  # because a url may only sit inside on_arm / on_intel.
   on_macos do
-    url "https://github.com/newdee/smep/releases/download/v0.1.2/smep-v0.1.2-macos-universal.zip"
-    sha256 "ba408b31da931bf4a5ab97d0fa301a8e5d4e3eb56692a1375456ea6695028e9c"
+    on_arm do
+      url "https://github.com/newdee/smep/releases/download/v0.1.2/smep-v0.1.2-macos-universal.zip"
+      sha256 "ba408b31da931bf4a5ab97d0fa301a8e5d4e3eb56692a1375456ea6695028e9c"
+    end
+    on_intel do
+      url "https://github.com/newdee/smep/releases/download/v0.1.2/smep-v0.1.2-macos-universal.zip"
+      sha256 "ba408b31da931bf4a5ab97d0fa301a8e5d4e3eb56692a1375456ea6695028e9c"
+    end
   end
 
   on_linux do
