@@ -72,16 +72,9 @@ jobs:
         if: steps.go.outputs.run == 'true'
         run: |
           brew install --formula newdee/tap/smep
-          bin="$(brew --prefix)/bin/smep"
-          echo "--- diagnostics"
-          ls -la "$bin" "$(readlink "$bin" || true)" || true
-          file "$(brew --prefix smep)/bin/smep"
-          codesign -dvvv "$(brew --prefix smep)/bin/smep" 2>&1 | head -20 || true
-          codesign --verify --verbose=2 "$(brew --prefix smep)/bin/smep" || true
-          set +e; "$bin" --version; echo "exit=$?"; set -e
-          sleep 2
-          log show --last 3m --predicate 'eventMessage CONTAINS "smep"' --style compact 2>/dev/null | tail -30 || true
-          echo "--- end diagnostics"
+          # a Developer ID signature must validate on its own (a binary
+          # signed inside a bundle does not, and AMFI kills it)
+          codesign --verify --verbose=2 "$(brew --prefix smep)/bin/smep"
           brew test newdee/tap/smep
           want=$(sed -n 's|.*/releases/download/v\([^/]*\)/.*|\1|p' Formula/smep.rb | sort -u)
           got=$("$(brew --prefix)/bin/smep" --version)
