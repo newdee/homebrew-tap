@@ -1,9 +1,10 @@
 name: smep
 
-# smep's formula, kept the way formula.yml keeps keepane's:
-#  - check: a change to the formula installs and tests it on macOS and Linux
+# smep's formula, kept the way formula.yml keeps keepane's, on macOS only
+# (the formula has no Linux build, see the note in it):
+#  - check: a change to the formula installs and tests it on a real Mac
 #  - bump: on a schedule (or by hand) follow smep's latest release, test
-#    the new version on both, and commit it only if both pass.
+#    the new version the same way, and commit it only if that passes.
 #
 # The bump runs here, with this repo's own token, so the smep repo needs
 # no secret with write access to the tap.
@@ -26,29 +27,18 @@ on:
 permissions:
   contents: write
 
-env:
-  GH_TOKEN: ${{ github.token }}
-  # brew audit --online asks the GitHub API about the repo; anonymous
-  # calls from a shared runner IP run into the rate limit
-  HOMEBREW_GITHUB_API_TOKEN: ${{ github.token }}
-  HOMEBREW_NO_AUTO_UPDATE: "1"
-  HOMEBREW_NO_INSTALL_CLEANUP: "1"
-
 jobs:
-  test:
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [macos-latest, ubuntu-latest]
-    runs-on: ${{ matrix.os }}
-    outputs:
-      version: ${{ steps.bump.outputs.version }}
+  formula:
+    runs-on: macos-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      # brew audit --online asks the GitHub API about the repo; anonymous
+      # calls from a shared runner IP run into the rate limit
+      HOMEBREW_GITHUB_API_TOKEN: ${{ github.token }}
+      HOMEBREW_NO_AUTO_UPDATE: "1"
+      HOMEBREW_NO_INSTALL_CLEANUP: "1"
     steps:
       - uses: actions/checkout@v4
-
-      - name: Homebrew on the path (Linux)
-        if: runner.os == 'Linux'
-        run: echo "/home/linuxbrew/.linuxbrew/bin" >> "$GITHUB_PATH"
 
       - name: Follow the latest smep release
         id: bump
@@ -86,33 +76,12 @@ jobs:
           want=$(sed -n 's|.*/releases/download/v\([^/]*\)/.*|\1|p' Formula/smep.rb | sort -u)
           got=$("$(brew --prefix)/bin/smep" --version)
           test "$got" = "smep $want"
-          if [ "$RUNNER_OS" = "macOS" ]; then
-            app="$(brew --prefix smep)/smep.app"
-            test -d "$app"
-            # the universal binary carries both architectures
-            lipo -archs "$app/Contents/MacOS/smep" | grep -q arm64
-            lipo -archs "$app/Contents/MacOS/smep" | grep -q x86_64
-          fi
+          # the universal binary carries both architectures
+          lipo -archs "$(brew --prefix)/bin/smep" | grep -q arm64
+          lipo -archs "$(brew --prefix)/bin/smep" | grep -q x86_64
           brew uninstall --formula newdee/tap/smep
           test ! -e "$(brew --prefix)/bin/smep"
 
-  publish:
-    needs: test
-    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Follow the latest smep release
-        id: bump
-        run: bash scripts/bump-smep.sh
-
       - name: Publish the bump
-        # only the version both platforms tested (a release published in
-        # between waits for the next run)
-        if: steps.bump.outputs.changed == 'true' && steps.bump.outputs.version == needs.test.outputs.version
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -am "smep ${{ steps.bump.outputs.version }}"
-          git push origin HEAD:main
+        if: steps.go.outputs.run == 'true' && steps.bump.outputs.changed == 'true'
+        run: git push origin HEAD:main

@@ -45,9 +45,10 @@ brew install newdee/tap/smep
 smep notes.md
 ```
 
-macOS (Apple Silicon and Intel, one universal binary) and Linux x86_64, from
-the release's own builds. `brew upgrade smep` takes a new version. This is
-the `smep` command; for a Finder-openable app use the `smep.app` from a
+macOS only (Apple Silicon and Intel, one universal binary), from the release's
+own build; on Linux use `cargo install smep` or the release tarball. `brew
+upgrade smep` takes a new version. This is the `smep` command; for a
+Finder-openable app use the `smep.app` from a
 [release](https://github.com/newdee/smep/releases).
 
 The formula follows smep's latest release on its own, the way keepane's does.
@@ -94,8 +95,9 @@ brew install newdee/tap/smep
 smep notes.md
 ```
 
-支持 macOS（Apple Silicon 与 Intel，同一个通用二进制）和 Linux x86_64，安装的是
-发布页上编译好的包。`brew upgrade smep` 升级到新版本。装的是 `smep` 命令；要在
-Finder 里双击打开，用[发布页](https://github.com/newdee/smep/releases)上的 `smep.app`。
+仅 macOS（Apple Silicon 与 Intel，同一个通用二进制），安装的是发布页上编译好的包；
+Linux 用 `cargo install smep` 或发布页的 tarball。`brew upgrade smep` 升级到新版本。
+装的是 `smep` 命令；要在 Finder 里双击打开，用[发布页](https://github.com/newdee/smep/releases)
+上的 `smep.app`。
 
 formula 会自己跟进 smep 的最新版本，方式与 keepane 相同。

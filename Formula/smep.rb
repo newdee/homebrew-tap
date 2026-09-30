@@ -8,37 +8,28 @@ class Smep < Formula
     strategy :github_latest
   end
 
-  # The release's own builds; scripts/bump-smep.sh keeps these three in
-  # step with it (the version in each url and the sha256 after it). The
-  # macOS archive is one universal binary, listed once per architecture
-  # because a url may only sit inside on_arm / on_intel.
+  # The release's own build: one universal binary, listed once per
+  # architecture because a url may only sit inside on_arm / on_intel.
+  # scripts/bump-smep.sh keeps both in step with the latest release (the
+  # version in each url and the sha256 after it).
+  #
+  # macOS only: the Linux release binary is linked against the build
+  # machine's system libraries (X11, xkbcommon, Wayland, Vulkan) and glibc,
+  # which a Homebrew prefix does not provide; Linux installs with
+  # `cargo install smep` or the release tarball.
   on_macos do
     on_arm do
-      url "https://github.com/newdee/smep/releases/download/v0.1.2/smep-v0.1.2-macos-universal.zip"
-      sha256 "ba408b31da931bf4a5ab97d0fa301a8e5d4e3eb56692a1375456ea6695028e9c"
+      url "https://github.com/newdee/smep/releases/download/v0.1.2/smep-v0.1.2-macos-universal.tar.gz"
+      sha256 "d95055f38ad141aa6bb52523b062fbcf015b71c72dc6fe8c89d24165c4b37df8"
     end
     on_intel do
-      url "https://github.com/newdee/smep/releases/download/v0.1.2/smep-v0.1.2-macos-universal.zip"
-      sha256 "ba408b31da931bf4a5ab97d0fa301a8e5d4e3eb56692a1375456ea6695028e9c"
-    end
-  end
-
-  on_linux do
-    on_intel do
-      url "https://github.com/newdee/smep/releases/download/v0.1.2/smep-v0.1.2-x86_64-linux.tar.gz"
-      sha256 "06d68b55968881a927303352862c77282baa7ee17cdd4613e66262a2962e687e"
+      url "https://github.com/newdee/smep/releases/download/v0.1.2/smep-v0.1.2-macos-universal.tar.gz"
+      sha256 "d95055f38ad141aa6bb52523b062fbcf015b71c72dc6fe8c89d24165c4b37df8"
     end
   end
 
   def install
-    if OS.mac?
-      # The release ships an app bundle; the program inside it is a plain
-      # (universal) executable, which is what a formula installs.
-      bin.install "smep.app/Contents/MacOS/smep"
-    else
-      bin.install "smep"
-      (share/"applications").install "smep.desktop"
-    end
+    bin.install "smep"
   end
 
   test do
