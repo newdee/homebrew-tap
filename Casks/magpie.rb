@@ -1,6 +1,6 @@
 cask "magpie" do
-  version "0.5.6"
-  sha256 "9a005bd4e950f70e51ce1b243545d67e9a36093521d17248b5d80f57ab18f3c3"
+  version "0.5.7"
+  sha256 "81da33ac35b16813d02ca14d0472a259a4b55cdd138d9ef4445079fb0b4e8c6f"
 
   url "https://github.com/newdee/magpie/releases/download/v#{version}/magpie_#{version}_aarch64.dmg"
   name "magpie"
