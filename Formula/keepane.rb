@@ -46,6 +46,9 @@ class Keepane < Formula
   end
 
   test do
+    # The server's socket in the test's own directory: Homebrew's sandbox
+    # lets a test reach a Unix socket only under it (not /tmp/keepane-UID).
+    ENV["KEEPANE_TMPDIR"] = testpath
     assert_match "keepane #{version}", shell_output("#{bin}/keepane -V")
     # A server of its own: a detached session comes up and is listed.
     system bin/"keepane", "-L", "brewtest", "new", "-d", "-s", "t"
