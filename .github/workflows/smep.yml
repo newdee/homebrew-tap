@@ -123,4 +123,7 @@ jobs:
 
       - name: Publish the bump
         if: steps.go.outputs.run == 'true' && steps.bump.outputs.changed == 'true'
-        run: git push origin HEAD:main
+        run: |
+          # another bump may have landed meanwhile
+          git pull --rebase origin main
+          git push origin HEAD:main
