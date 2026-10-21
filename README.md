@@ -41,17 +41,24 @@ previewer written in Rust: source, split and rendered views, the rendered
 one editable block by block.
 
 ```sh
-brew install newdee/tap/smep
+brew install --cask newdee/tap/smep
 smep notes.md
 ```
 
-macOS only (Apple Silicon and Intel, one universal binary), from the release's
-own build; on Linux use `cargo install smep` or the release tarball. `brew
-upgrade smep` takes a new version. This is the `smep` command; for a
-Finder-openable app use the `smep.app` from a
-[release](https://github.com/newdee/smep/releases).
+The cask puts `smep.app` in `/Applications` (Finder, Spotlight, the Dock,
+"Open With", the default app for `.md`) and links its binary as the `smep`
+command. macOS only (Apple Silicon and Intel, one universal build), from the
+release's own build; on Linux use `cargo install smep` or the release tarball.
+The app is Developer ID signed but not yet notarized: allow the first start
+once under System Settings, Privacy & Security, Open Anyway, or install with
+`--no-quarantine`.
 
-The formula follows smep's latest release on its own, the way keepane's does.
+`brew install newdee/tap/smep`, the formula, installs the command alone. A bare
+binary is a command-line tool to macOS, so Finder and "Open With" run it inside
+a Terminal window; take the cask for an application. `brew upgrade` takes a new
+version of either.
+
+Both follow smep's latest release on their own, the way keepane's formula does.
 
 ---
 
@@ -91,13 +98,18 @@ Linux runner 上真装并测试，通过了才提交。
 预览器：源码、分栏、渲染三种视图，渲染视图可以按块直接编辑。
 
 ```sh
-brew install newdee/tap/smep
+brew install --cask newdee/tap/smep
 smep notes.md
 ```
 
-仅 macOS（Apple Silicon 与 Intel，同一个通用二进制），安装的是发布页上编译好的包；
-Linux 用 `cargo install smep` 或发布页的 tarball。`brew upgrade smep` 升级到新版本。
-装的是 `smep` 命令；要在 Finder 里双击打开，用[发布页](https://github.com/newdee/smep/releases)
-上的 `smep.app`。
+cask 把 `smep.app` 装进 `/Applications`（Finder、Spotlight、Dock、"打开方式"、
+`.md` 默认应用都能用），并把它的二进制链接成 `smep` 命令。仅 macOS（Apple Silicon
+与 Intel，同一个通用构建），安装的是发布页上编译好的包；Linux 用 `cargo install smep`
+或发布页的 tarball。应用有 Developer ID 签名但还没公证：第一次启动在"系统设置 >
+隐私与安全性"里点一次"仍要打开"，或者装的时候加 `--no-quarantine`。
 
-formula 会自己跟进 smep 的最新版本，方式与 keepane 相同。
+`brew install newdee/tap/smep`（formula）只装 `smep` 命令。裸二进制在 macOS 眼里是
+命令行工具，Finder 和"打开方式"会在终端窗口里运行它；要应用就装 cask。两者都用
+`brew upgrade` 升级。
+
+两者都会自己跟进 smep 的最新版本，方式与 keepane 的 formula 相同。

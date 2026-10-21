@@ -1,8 +1,9 @@
 name: smep
 
-# smep's formula, kept the way formula.yml keeps keepane's, on macOS only
-# (the formula has no Linux build, see the note in it):
-#  - check: a change to the formula installs and tests it on a real Mac
+# smep's formula (the `smep` command) and cask (smep.app plus the command),
+# kept the way formula.yml keeps keepane's, on macOS only (there is no
+# Linux build, see the note in the formula):
+#  - check: a change to either installs and tests both on a real Mac
 #  - bump: on a schedule (or by hand) follow smep's latest release, test
 #    the new version the same way, and commit it only if that passes.
 #
@@ -13,11 +14,13 @@ on:
     branches: [main]
     paths:
       - Formula/smep.rb
+      - Casks/smep.rb
       - scripts/bump-smep.sh
       - .github/workflows/smep.yml
   pull_request:
     paths:
       - Formula/smep.rb
+      - Casks/smep.rb
       - scripts/bump-smep.sh
       - .github/workflows/smep.yml
   schedule:
@@ -28,7 +31,7 @@ permissions:
   contents: write
 
 jobs:
-  formula:
+  smep:
     runs-on: macos-latest
     env:
       GH_TOKEN: ${{ github.token }}
@@ -57,18 +60,25 @@ jobs:
       - name: Tap this checkout
         if: steps.go.outputs.run == 'true'
         run: |
-          # brew taps a git repo; commit the bumped formula locally first so
-          # the tap sees the file as it will be pushed
+          # brew taps a git repo; commit the bumped files locally first so
+          # the tap sees them as they will be pushed
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git diff --quiet || git commit -am "smep ${{ steps.bump.outputs.version }}"
           brew tap newdee/tap "$GITHUB_WORKSPACE"
+          # the formula and the cask name the same release
+          formula=$(sed -n 's|.*/releases/download/v\([^/]*\)/.*|\1|p' Formula/smep.rb | sort -u)
+          cask=$(sed -n 's/^  version "\(.*\)"$/\1/p' Casks/smep.rb)
+          test "$formula" = "$cask"
+          echo "version=$cask" >> "$GITHUB_OUTPUT"
 
       - name: Audit
         if: steps.go.outputs.run == 'true'
-        run: brew audit --formula --strict --online newdee/tap/smep
+        run: |
+          brew audit --formula --strict --online newdee/tap/smep
+          brew audit --cask --strict --online newdee/tap/smep
 
-      - name: Install, test, uninstall
+      - name: Install, test, uninstall the formula
         if: steps.go.outputs.run == 'true'
         run: |
           brew install --formula newdee/tap/smep
@@ -83,6 +93,33 @@ jobs:
           lipo -archs "$(brew --prefix)/bin/smep" | grep -q arm64
           lipo -archs "$(brew --prefix)/bin/smep" | grep -q x86_64
           brew uninstall --formula newdee/tap/smep
+          test ! -e "$(brew --prefix)/bin/smep"
+
+      - name: Install, test, uninstall the cask
+        if: steps.go.outputs.run == 'true'
+        run: |
+          brew install --cask newdee/tap/smep
+          app=/Applications/smep.app
+          test -d "$app"
+          want=$(sed -n 's/^  version "\(.*\)"$/\1/p' Casks/smep.rb)
+          got=$(defaults read "$app/Contents/Info.plist" CFBundleShortVersionString)
+          test "$want" = "$got"
+          codesign --verify --deep --strict --verbose=2 "$app"
+          # Gatekeeper accepts the app once it is notarized; until then the
+          # quarantine the cask set would stop the command below, as it
+          # stops the first start from Finder (the cask's caveats say so)
+          if ! spctl --assess --type execute --verbose=2 "$app"; then
+            echo "::warning::smep.app is not notarized; Gatekeeper needs Open Anyway on the first start"
+            xattr -dr com.apple.quarantine "$app"
+          fi
+          # the command is the app's own binary
+          test -L "$(brew --prefix)/bin/smep"
+          got=$("$(brew --prefix)/bin/smep" --version)
+          test "$got" = "smep $want"
+          lipo -archs "$app/Contents/MacOS/smep" | grep -q arm64
+          lipo -archs "$app/Contents/MacOS/smep" | grep -q x86_64
+          brew uninstall --cask --zap newdee/tap/smep
+          test ! -d "$app"
           test ! -e "$(brew --prefix)/bin/smep"
 
       - name: Publish the bump
