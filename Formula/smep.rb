@@ -19,12 +19,12 @@ class Smep < Formula
   # `cargo install smep` or the release tarball.
   on_macos do
     on_arm do
-      url "https://github.com/newdee/smep/releases/download/v0.1.7/smep-v0.1.7-macos-universal.tar.gz"
-      sha256 "476edc9355fdcd8885258fbcfdb2e8d697c57a08d9b1a1db74329d1025656a34"
+      url "https://github.com/newdee/smep/releases/download/v0.1.8/smep-v0.1.8-macos-universal.tar.gz"
+      sha256 "c6a77ea47dff3f05135620f34e4874192b314c5e66d4d440ed5d0dfc2f113bfb"
     end
     on_intel do
-      url "https://github.com/newdee/smep/releases/download/v0.1.7/smep-v0.1.7-macos-universal.tar.gz"
-      sha256 "476edc9355fdcd8885258fbcfdb2e8d697c57a08d9b1a1db74329d1025656a34"
+      url "https://github.com/newdee/smep/releases/download/v0.1.8/smep-v0.1.8-macos-universal.tar.gz"
+      sha256 "c6a77ea47dff3f05135620f34e4874192b314c5e66d4d440ed5d0dfc2f113bfb"
     end
   end
 
