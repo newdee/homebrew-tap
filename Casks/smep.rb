@@ -14,7 +14,7 @@ cask "smep" do
 
   # The formula puts bin/smep there too; brew refuses the second one (a
   # cask cannot name a formula in conflicts_with).
-  depends_on macos: ">= :monterey"
+  depends_on macos: :monterey
 
   # The application for Finder, Spotlight, the Dock and "Open With" (a bare
   # binary, which the formula installs, is a command-line tool to macOS:
