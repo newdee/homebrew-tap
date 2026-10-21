@@ -41,7 +41,7 @@ jobs:
       HOMEBREW_NO_AUTO_UPDATE: "1"
       HOMEBREW_NO_INSTALL_CLEANUP: "1"
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Follow the latest smep release
         id: bump
@@ -70,7 +70,6 @@ jobs:
           formula=$(sed -n 's|.*/releases/download/v\([^/]*\)/.*|\1|p' Formula/smep.rb | sort -u)
           cask=$(sed -n 's/^  version "\(.*\)"$/\1/p' Casks/smep.rb)
           test "$formula" = "$cask"
-          echo "version=$cask" >> "$GITHUB_OUTPUT"
 
       - name: Audit
         if: steps.go.outputs.run == 'true'
