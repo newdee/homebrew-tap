@@ -1,6 +1,6 @@
 cask "smep" do
-  version "0.1.8"
-  sha256 "a37ffa78447773050be59810f0b28ec4210380d9411e434ee4d17d1afd29af26"
+  version "0.1.9"
+  sha256 "83634769709b52f34ad0589c5d9c51fde897b09fdd1b8488df4718babccaac40"
 
   url "https://github.com/newdee/smep/releases/download/v#{version}/smep-v#{version}-macos-universal.zip"
   name "smep"
