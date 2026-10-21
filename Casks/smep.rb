@@ -12,8 +12,8 @@ cask "smep" do
     strategy :github_latest
   end
 
-  # The formula links the same program into bin; both would own bin/smep.
-  conflicts_with formula: "smep"
+  # The formula puts bin/smep there too; brew refuses the second one (a
+  # cask cannot name a formula in conflicts_with).
   depends_on macos: ">= :monterey"
 
   # The application for Finder, Spotlight, the Dock and "Open With" (a bare
