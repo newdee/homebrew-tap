@@ -1,5 +1,13 @@
 # newdee/homebrew-tap
 
+Homebrew 6 loads nothing from a third-party tap until you trust it. Do this once,
+before the first install from this tap:
+
+```sh
+brew tap newdee/tap
+brew trust --tap newdee/tap
+```
+
 ## magpie
 
 Homebrew casks for [magpie](https://github.com/newdee/magpie), a Spotlight-style
@@ -61,6 +69,13 @@ version of either.
 Both follow smep's latest release on their own, the way keepane's formula does.
 
 ---
+
+Homebrew 6 起，第三方源要先信任才能用。第一次从这个源安装之前，运行一次：
+
+```sh
+brew tap newdee/tap
+brew trust --tap newdee/tap
+```
 
 ## magpie
 
