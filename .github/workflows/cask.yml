@@ -53,6 +53,8 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git diff --quiet || git commit -am "magpie ${{ steps.bump.outputs.version }}"
           brew tap newdee/tap "$GITHUB_WORKSPACE"
+          # Homebrew 6 loads nothing from a tap until it is trusted
+          brew trust --tap newdee/tap
 
       - name: Audit
         if: steps.go.outputs.run == 'true'

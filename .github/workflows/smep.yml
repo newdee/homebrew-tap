@@ -66,6 +66,8 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git diff --quiet || git commit -am "smep ${{ steps.bump.outputs.version }}"
           brew tap newdee/tap "$GITHUB_WORKSPACE"
+          # Homebrew 6 loads nothing from a tap until it is trusted
+          brew trust --tap newdee/tap
           # the formula and the cask name the same release
           formula=$(sed -n 's|.*/releases/download/v\([^/]*\)/.*|\1|p' Formula/smep.rb | sort -u)
           cask=$(sed -n 's/^  version "\(.*\)"$/\1/p' Casks/smep.rb)
