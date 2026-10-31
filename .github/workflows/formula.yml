@@ -73,6 +73,12 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git diff --quiet || git commit -am "keepane ${{ steps.bump.outputs.version }}"
           brew tap newdee/tap "$GITHUB_WORKSPACE"
+          # Homebrew 6 loads a formula of a tap only once it is trusted (the
+          # audit below loads it without installing it): the one under test,
+          # not the whole tap. An older brew has no `trust`, and needs none.
+          if brew help trust >/dev/null 2>&1; then
+            brew trust --formula newdee/tap/keepane
+          fi
 
       - name: Audit
         if: steps.go.outputs.run == 'true'
