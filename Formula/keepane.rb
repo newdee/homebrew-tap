@@ -12,19 +12,19 @@ class Keepane < Formula
   # in step with it (the version in each url and the sha256 after it).
   on_macos do
     on_arm do
-      url "https://github.com/newdee/keepane/releases/download/v0.64.0/keepane-v0.64.0-macos-aarch64.tar.gz"
-      sha256 "4d246b4efbd022bf919f7bda364749002c35c549102948b578f2f4764a8181ad"
+      url "https://github.com/newdee/keepane/releases/download/v0.65.0/keepane-v0.65.0-macos-aarch64.tar.gz"
+      sha256 "d369e54e3bd49c58596861c1b5d9cc55c95abfbc507fc4298ebea5e0454e2761"
     end
     on_intel do
-      url "https://github.com/newdee/keepane/releases/download/v0.64.0/keepane-v0.64.0-macos-x86_64.tar.gz"
-      sha256 "342ca21bf80ac1a0d9b5801ec0efd644298052fb14c83802dc88671a840c2f46"
+      url "https://github.com/newdee/keepane/releases/download/v0.65.0/keepane-v0.65.0-macos-x86_64.tar.gz"
+      sha256 "b6e59c62ed021e015695950d10248bfe8645f61c715fe81a09b0c31bc78badee"
     end
   end
 
   on_linux do
     on_intel do
-      url "https://github.com/newdee/keepane/releases/download/v0.64.0/keepane-v0.64.0-linux-x86_64.tar.gz"
-      sha256 "3be58344bfa5514a2bb25b10e5c03f5508b0df2b98dde96092cef5c7d5da1b17"
+      url "https://github.com/newdee/keepane/releases/download/v0.65.0/keepane-v0.65.0-linux-x86_64.tar.gz"
+      sha256 "62e56befb4e435ebd6cdad38b2a2edf4c5c1acbaaa1c687aa61d2e408fc900c9"
     end
   end
 
