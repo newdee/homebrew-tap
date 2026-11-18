@@ -73,8 +73,27 @@ version of either.
 
 Both follow smep's latest release on their own, the way keepane's formula does.
 
----
+## unifyterm
 
+[UnifyTerm](https://github.com/newdee/unifyterm) is one terminal for Windows,
+macOS and Linux: the same Unix commands everywhere (`ut`), a command history
+you can search as you type, pictures and markdown in the terminal.
+
+```sh
+brew install newdee/tap/unifyterm
+unifyterm
+```
+
+macOS (Apple Silicon and Intel) and Linux x86_64, from the release's own builds.
+The formula installs the `unifyterm` and `ut` commands; on macOS it keeps
+`UnifyTerm.app` in its own folder too (`brew info unifyterm` says how to put it
+in the Dock). On Linux the window needs Vulkan and xkbcommon from the system
+(on Debian and Ubuntu: `mesa-vulkan-drivers libxkbcommon-x11-0`). The builds are
+not signed yet. `brew upgrade unifyterm` takes a new version.
+
+The formula follows UnifyTerm's latest release on its own, the way keepane's does.
+
+---
 Homebrew 6 起，第三方源要先信任才能用。第一次从这个源安装之前，运行一次：
 
 ```sh
@@ -137,3 +156,22 @@ cask 把 `smep.app` 装进 `/Applications`（Finder、Spotlight、Dock、"打开
 `brew upgrade` 升级。
 
 两者都会自己跟进 smep 的最新版本，方式与 keepane 的 formula 相同。
+
+## unifyterm
+
+[UnifyTerm](https://github.com/newdee/unifyterm) 是一个 Windows、macOS、Linux 用法
+一样的终端：各平台同一套 Unix 命令（`ut`），边打字边搜的命令历史，终端里看图片和
+markdown。
+
+```sh
+brew install newdee/tap/unifyterm
+unifyterm
+```
+
+支持 macOS（Apple Silicon 与 Intel）和 Linux x86_64，安装的是发布页上编译好的包。
+formula 装 `unifyterm` 和 `ut` 两个命令；macOS 上 `UnifyTerm.app` 也放在它自己的
+目录里（`brew info unifyterm` 会说怎样放进 Dock）。Linux 上窗口需要系统的 Vulkan 和
+xkbcommon（Debian、Ubuntu：`mesa-vulkan-drivers libxkbcommon-x11-0`）。安装包还没有
+签名。`brew upgrade unifyterm` 升级到新版本。
+
+formula 会自己跟进 UnifyTerm 的最新版本，方式与 keepane 的 formula 相同。

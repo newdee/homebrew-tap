@@ -1,0 +1,108 @@
+name: unifyterm
+
+# UnifyTerm's formula, kept the way formula.yml keeps keepane's:
+#  - check: a change to the formula installs and tests it on macOS and Linux
+#  - bump: on a schedule (or by hand) follow UnifyTerm's latest release, test
+#    the new version on both, and commit it only if both pass.
+# The bump runs here, with this repo's own token, so the unifyterm repo needs
+# no secret with write access to the tap.
+on:
+  push:
+    branches: [main]
+    paths:
+      - Formula/unifyterm.rb
+      - scripts/bump-unifyterm.sh
+      - .github/workflows/unifyterm.yml
+  pull_request:
+    paths:
+      - Formula/unifyterm.rb
+      - scripts/bump-unifyterm.sh
+      - .github/workflows/unifyterm.yml
+  schedule:
+    - cron: "27 */6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  GH_TOKEN: ${{ github.token }}
+  HOMEBREW_GITHUB_API_TOKEN: ${{ github.token }}
+  HOMEBREW_NO_AUTO_UPDATE: "1"
+  HOMEBREW_NO_INSTALL_CLEANUP: "1"
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    outputs:
+      version: ${{ steps.bump.outputs.version }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Homebrew on the path, and the window's libraries (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          echo "/home/linuxbrew/.linuxbrew/bin" >> "$GITHUB_PATH"
+          sudo apt-get update && sudo apt-get install -y libxkbcommon-x11-0 libvulkan1
+
+      - name: Follow the latest UnifyTerm release
+        id: bump
+        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+        run: bash scripts/bump-unifyterm.sh
+
+      - name: Skip when nothing changed
+        id: go
+        run: |
+          if [ "${{ github.event_name }}" = "schedule" ] || [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "run=${{ steps.bump.outputs.changed }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Tap this checkout
+        if: steps.go.outputs.run == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git diff --quiet || git commit -am "unifyterm ${{ steps.bump.outputs.version }}"
+          brew tap newdee/tap "$GITHUB_WORKSPACE"
+          if brew help trust >/dev/null 2>&1; then
+            brew trust --tap newdee/tap
+            brew trust --formula newdee/tap/unifyterm
+          fi
+
+      - name: Audit
+        if: steps.go.outputs.run == 'true'
+        run: brew audit --formula --strict --online newdee/tap/unifyterm
+
+      - name: Install, test, uninstall
+        if: steps.go.outputs.run == 'true'
+        run: |
+          brew install --formula newdee/tap/unifyterm
+          brew test newdee/tap/unifyterm
+          want=$(sed -n 's|.*/releases/download/v\([^/]*\)/.*|\1|p' Formula/unifyterm.rb | sort -u)
+          "$(brew --prefix)/bin/unifyterm" --version | grep -q "^UnifyTerm $want "
+          brew uninstall --formula newdee/tap/unifyterm
+          test ! -e "$(brew --prefix)/bin/unifyterm"
+
+  publish:
+    needs: test
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Follow the latest UnifyTerm release
+        id: bump
+        run: bash scripts/bump-unifyterm.sh
+      - name: Publish the bump
+        if: steps.bump.outputs.changed == 'true' && steps.bump.outputs.version == needs.test.outputs.version
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -am "unifyterm ${{ steps.bump.outputs.version }}"
+          git pull --rebase origin main
+          git push origin HEAD:main
