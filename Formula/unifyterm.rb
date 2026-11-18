@@ -1,5 +1,5 @@
 class Unifyterm < Formula
-  desc "One terminal for Windows, macOS and Linux, with the same Unix commands everywhere"
+  desc "Terminal for Windows, macOS and Linux with the same Unix commands everywhere"
   homepage "https://github.com/newdee/unifyterm"
   license "MIT"
 
