@@ -12,19 +12,19 @@ class Unifyterm < Formula
   # in step with it (the version in each url and the sha256 after it).
   on_macos do
     on_arm do
-      url "https://github.com/newdee/unifyterm/releases/download/v0.6.1/unifyterm-v0.6.1-macos-aarch64.tar.gz"
-      sha256 "bcf71619f71d8d8cfb0249a805d184fcdbcb314a3e9062f71a7f2b5a49779128"
+      url "https://github.com/newdee/unifyterm/releases/download/v0.6.2/unifyterm-v0.6.2-macos-aarch64.tar.gz"
+      sha256 "0431d02ebf67e6a08cb71f41e9ee47ad27b133de0aa4943b66ffc7ab953b502c"
     end
     on_intel do
-      url "https://github.com/newdee/unifyterm/releases/download/v0.6.1/unifyterm-v0.6.1-macos-x86_64.tar.gz"
-      sha256 "39567a4740ea4891626770ed2c37f0fc67b26375bd9572830ce8b5d175b7bbbc"
+      url "https://github.com/newdee/unifyterm/releases/download/v0.6.2/unifyterm-v0.6.2-macos-x86_64.tar.gz"
+      sha256 "fc8f1269efe4fc3ea2fa182c88c6a7cd4f3fe7e04eeedfa4c9d6570f952da0e3"
     end
   end
 
   on_linux do
     on_intel do
-      url "https://github.com/newdee/unifyterm/releases/download/v0.6.1/unifyterm-v0.6.1-linux-x86_64.tar.gz"
-      sha256 "9196fe15f4f5e4be304673de15dbb53b284350e22574799a7fb9be9a3124724e"
+      url "https://github.com/newdee/unifyterm/releases/download/v0.6.2/unifyterm-v0.6.2-linux-x86_64.tar.gz"
+      sha256 "fc33f57d577520317c844f4643271a8e31f395d1a2c9d575f42aade23ca0b1be"
     end
   end
 
